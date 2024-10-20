@@ -5,7 +5,7 @@
 # pt.exec( /-> load('mycode.be') )
 # See README for explanation
 
-# Version 0.7.8
+# Version 0.7.7
 
 var pt_module = module("persist_mqtt")
 
@@ -141,7 +141,8 @@ pt_module.init = def (m)
       )
     end
 
-    static def selfupdate()
+    def selfupdate()
+      self.save()
       var fn = '/persist_mqtt.be'
       var fd=open(fn)
       var lbytes = fd.readbytes()
