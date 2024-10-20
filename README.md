@@ -70,23 +70,21 @@ if there is a restart from the web interface or a restart 1 console/mqtt command
 
 - pt.dirty() Makes the next save to send the data to MQTT even if the server is updated. The difference with persist(tasmota 14.3) is that persist_mqtt detects changes even deep in tables etc. So this function is not as useful as with persist.
 
-## Use cases
-Here are some advantages over persist:
+## Advantages
+Note that If the project needs mqtt to work, the use of persist_mqtt does not add complexity, neither an additional point of failure.
 
-- If the project needs mqtt to work, the use of persist_mqtt does not add complexity, neither an additional point of failure.
 - The data can be changed frequently withut limits. On the contrary the persist module imposes a some problems to the developer with ~10000 reliable writes.
 - We can inspect the variables with an mqtt client by listening the stat/tsamota_topic/PersistMQTT making the module a good debugging tool.
 - We can move the project to another esp32 module(using the sane topic) and the variables we stored will be there.
-- The save_every(seconds) feature can simplify the code,if we can tolerate to miss a very resent variable (in the event of a unplanned reset/power off). Minimum is 5 sec (at this time) 
+- The save_every(seconds) feature can simplify the code,if we can tolerate to miss a very resent variable (in the event of a unplanned reset/power off). Minimum is 5 sec.
 - Works even with Tasmota "savedata = OFF" command
 
-On the other hand there are some disadvantages also:
-
+## Disadvantages
 - limited space for variables (~1000 bytes in json format)
 - The module cannot be used immediatelly, complicating the import as we've seen above.
 - The speed of save() is slow. The good news is that mqtt is performed asynchronously (I believe) so the save() actually returns fast but the data needs some time (in the range of 0.1-0.5 sec) to reach the server. The other operations pt.var1=val1 etc do not have a speed penaly
 - Whenever has access to the server can view and change the variables ! BE WARNED !
-- if the project does not need an MQTT server or not even network onnectivity, the use this module adds an unnececary point of failure.
+- if the project does not need an MQTT server or not even network connectivity, the use of this module adds complexity and an unnececary point of failure.
 
 ## Temporarily using persist_mqtt instead of persist for development
 You may want this for 2 reasons. To reduce flash wear and to be able to view the variables in real time.
