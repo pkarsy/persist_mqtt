@@ -5,7 +5,7 @@
 # pt.exec( /-> load('mycode.be') )
 # See README for explanation
 
-# Version 0.7.6
+# Version 0.7.7
 
 var pt_module = module("persist_mqtt")
 
@@ -131,7 +131,7 @@ pt_module.init = def (m)
 
     def save_every(sec)
       tasmota.remove_timer(PersistMQTT._timer_id)
-      if sec < 10 print('Auto save is disabled')  return end
+      if sec < 5 print('Auto save is disabled')  return end
       # print('save_every(' .. sec .. ')') end
       self.save()
       tasmota.set_timer(

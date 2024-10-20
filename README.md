@@ -56,9 +56,9 @@ Only values that can be serialized with json can be saved. Fortunatelly this inc
 - About 1000 bytes of json data can be saved. This is OK for the intented purpose which is to store a limited set of frequently changed values such as counters. For bigger staorage needs and data that are not frequently change you can use the persist module
 
 ## Saving the variables
-As with persist the values are not saved immedatelly. Use pt.save() for this.
+As with persist the values are not saved immedatelly. Use pt.save() whenever is needed.
 
-if there is a restart from the web interface or a restart 1 console/mqtt command, the data will be saved, but NOT if there is a power outage a crash of the BerryVM or anything similar. See save_every() for a mitigation to the problem, below
+if there is a restart from the web interface or a restart 1 console/mqtt command, at save() will be performed automatically, but NOT if there is a power outage a crash of the BerryVM or anything similar. See also save_every() for an alternative way to save the data. 
 
 ### Methods not present, or working differently than buildin persist
 
@@ -70,21 +70,21 @@ if there is a restart from the web interface or a restart 1 console/mqtt command
 
 - pt.dirty() Makes the next save to send the data to MQTT even if the server is updated. The difference with persist(tasmota 14.3) is that persist_mqtt detects changes even deep in tables etc. So this function is not as useful as with persist.
 
-## Purpose
+## Use cases
 Here are some advantages over persist:
 
-- If the project needs mqtt to work, the use of persist_mqtt does not add complexity, neither an additional point of failure
-- The data can be changed frequently withut limits. On the contrary the persist module imposes a lot of dillemas to the developer with ~10000 writes
+- If the project needs mqtt to work, the use of persist_mqtt does not add complexity, neither an additional point of failure.
+- The data can be changed frequently withut limits. On the contrary the persist module imposes a some problems to the developer with ~10000 reliable writes.
 - We can inspect the variables with an mqtt client by listening the stat/tsamota_topic/PersistMQTT making the module a good debugging tool.
 - We can move the project to another esp32 module(using the sane topic) and the variables we stored will be there.
-- The save_every(seconds) feature can simplify the code a lot if we can tolerate to miss a very resent variable (in the event of a unplanned reset/power off)
-- Works even with tasmota "savedata = OFF" command
+- The save_every(seconds) feature can simplify the code,if we can tolerate to miss a very resent variable (in the event of a unplanned reset/power off). Minimum is 5 sec (at this time) 
+- Works even with Tasmota "savedata = OFF" command
 
 On the other hand there are some disadvantages also:
 
 - limited space for variables (~1000 bytes in json format)
-- The module cannot be used immediatelly, complicating the import
-- The speed of save() is slow. The good news is that mqtt is performed asynchronously (I believe) so the save() actually returns fast but the data needs some time (mush less than 1sec) to reach the server. The other operations pt.var1=val1 etc do not have a speed penaly
+- The module cannot be used immediatelly, complicating the import as we've seen above.
+- The speed of save() is slow. The good news is that mqtt is performed asynchronously (I believe) so the save() actually returns fast but the data needs some time (in the range of 0.1-0.5 sec) to reach the server. The other operations pt.var1=val1 etc do not have a speed penaly
 - Whenever has access to the server can view and change the variables ! BE WARNED !
 - if the project does not need an MQTT server or even networkconnectivity, the use this module adds an unnececary point of failure. In this case can only be used on development to be able to visually see the variables on MQTT server.
 
