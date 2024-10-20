@@ -149,7 +149,7 @@ pt_module.init = def (m)
       var lc = crc.crc32(0, fd.readbytes())
       fd.close() fd = nil
       var cl = webclient()
-      cl.begin('https://raw.githubusercontent.com/pkarsy/persist_mqtt/refs/heads/main'+fn)
+      cl.begin('https://raw.githubusercontent.com/pkarsy/persist_mqtt/refs/heads/main' + fn)
       cl.GET()
       var rbytes = cl.get_bytes()
       cl.close() cl = nil
