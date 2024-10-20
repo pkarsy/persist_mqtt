@@ -144,12 +144,12 @@ pt_module.init = def (m)
     def selfupdate()
       self.save()
       import crc
-      var fn = '/persist_mqtt_1.be'
+      var fn = '/persist_mqtt.be'
       var fd=open(fn)
       var lc = crc.crc32(0, fd.readbytes())
       fd.close() fd = nil
       var cl = webclient()
-      cl.begin('https://raw.githubusercontent.com/pkarsy/TasmotaBerryTime/refs/heads/main/ds3231'+fn)
+      cl.begin('https://raw.githubusercontent.com/pkarsy/persist_mqtt/refs/heads/main'+fn)
       cl.GET()
       var rbytes = cl.get_bytes()
       cl.close() cl = nil
