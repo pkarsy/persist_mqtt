@@ -5,7 +5,7 @@
 # pt.exec( /-> load('mycode.be') )
 # See README for explanation
 
-# Version 0.7.4
+# Version 0.7.6
 
 var pt_module = module("persist_mqtt")
 
