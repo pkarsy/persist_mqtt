@@ -86,7 +86,7 @@ On the other hand there are some disadvantages also:
 - The module cannot be used immediatelly, complicating the import as we've seen above.
 - The speed of save() is slow. The good news is that mqtt is performed asynchronously (I believe) so the save() actually returns fast but the data needs some time (in the range of 0.1-0.5 sec) to reach the server. The other operations pt.var1=val1 etc do not have a speed penaly
 - Whenever has access to the server can view and change the variables ! BE WARNED !
-- if the project does not need an MQTT server or even networkconnectivity, the use this module adds an unnececary point of failure. In this case can only be used on development to be able to visually see the variables on MQTT server.
+- if the project does not need an MQTT server or not even network onnectivity, the use this module adds an unnececary point of failure.
 
 ## Temporarily using persist_mqtt instead of persist for development
 You may want this for 2 reasons. To reduce flash wear and to be able to view the variables in real time.
