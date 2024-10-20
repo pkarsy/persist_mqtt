@@ -143,10 +143,8 @@ pt_module.init = def (m)
 
     def selfupdate()
       self.save()
-      #import crc
       var fn = '/persist_mqtt.be'
       var fd=open(fn)
-      #var lc = crc.crc32(0, fd.readbytes())
       var lbytes = fd.readbytes()
       fd.close() fd = nil
       var cl = webclient()
@@ -154,7 +152,6 @@ pt_module.init = def (m)
       cl.GET()
       var rbytes = cl.get_bytes()
       cl.close() cl = nil
-      #var rc = crc.crc32(0, rbytes)
       if rbytes == lbytes
         print('The code is up to date')
         return
