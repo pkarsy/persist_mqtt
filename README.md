@@ -95,7 +95,7 @@ Note that If the project needs mqtt to work, the use of persist_mqtt does not ad
 ## Temporarily using persist_mqtt instead of persist for development
 You may want this to reduce flash wear and/or to be able to view the variables in real time.
 
-'autoexec_ready.be' See "Imprting the module" above
+'autoexec_ready.be' See "Importing the module" above
 ```
 load('mycode.be')
 ```
