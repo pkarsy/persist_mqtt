@@ -11,12 +11,9 @@ Put the persist_mqtt.be file at the top level of the ESP32xx filesystem
 The fisrt time the module is loaded write in BerryScriptingConsole:
 ```
 import persist_mqtt as pt
-#
-# Creates an empty pool of variables in the MQTT server
-# Do not skip this .zero() step, the module will not work
-#
-pt.zero()
+pt.zero() # Creates an empty pool of variables
 ```
+**Do not skip the pt.zero() step, the module will not work !**
 After this and for interactive use (BerryConsole), the module can be loaded as usual.
 
 **However for use by other scripts special attention is needed.**
