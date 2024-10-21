@@ -14,6 +14,7 @@ import persist_mqtt as pt
 pt.zero() # Creates an empty pool of variables
 ```
 **Do not skip the pt.zero() step, the module will not work !**
+
 After this and for interactive use (BerryConsole), the module can be loaded as usual.
 
 **However for use by other scripts special attention is needed.**
