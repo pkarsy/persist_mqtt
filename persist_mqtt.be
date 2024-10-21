@@ -110,18 +110,25 @@ pt_module.init = def (m)
       if type(self._exec_callback) == 'function'
         self._exec_callback()
       end
-      self._exec_callback = /-> print('Cannot exec anything, the module is started')
+      # nil informs the exec() function that no callback is pending
+      self._exec_callback = nil
     end
 
     def exec(cb) # calls the "cb" function/closure when the variables are feched from the server
-      if self._module_ready
-        self._exec_callback()
+      if type(cb) != 'function'
+        print('Needs a callback function, got', type(cb) )
         return
       end
-      if type(cb) == 'function'
-        self._exec_callback = cb
+      if self._exec_callback != nil
+        print('A callback is pending')
+        return
+      end
+      if self._module_ready
+        # executes the function immediatelly
+        cb()
       else
-        print('Needs a callback function, got', type(cb) )
+        # postpone the execution when the variables are feched from the broker
+        self._exec_callback = cb
       end
     end
 
@@ -147,11 +154,19 @@ pt_module.init = def (m)
       var fd=open(fn)
       var lbytes = fd.readbytes()
       fd.close() fd = nil
+      if size(lbytes) < 2000
+        print('Cannot read the local script')
+        return
+      end
       var cl = webclient()
       cl.begin('https://raw.githubusercontent.com/pkarsy/persist_mqtt/refs/heads/main' + fn)
       cl.GET()
       var rbytes = cl.get_bytes()
       cl.close() cl = nil
+      if size(rbytes) < 2000
+        print('Cannot fetch the remote script')
+        return
+      end
       if rbytes == lbytes
         print('The code is up to date')
         return
