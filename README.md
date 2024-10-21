@@ -70,9 +70,9 @@ if there is a planned restart (web interface or a "restart 1" command), a save w
 
 - pt.save_every(sec>=5) saves the values IF there are changes to be pushed. Note that persist_mqtt will detect data changes even deep inside tables or maps. Any value <5sec will disable auto-saves. Not present in persist.
 
-- pt.selfupdate() fetches an updated (if it exists) persist_mqtt module from the github page.
+- pt.selfupdate() fetches an updated (if it exists) persist_mqtt module from the github page. For interactive use only.
 
-- pt.zero() is clearing all the variables like the persist module but if the module is ready(), it needs a zero(true) for safety. Never put this function in a script.
+- pt.zero() is clearing all the variables like the persist module but if the module is ready(), it needs a zero(true) for safety. Never put this function in a script. This function is mainly useful when we install persist_mqtt to a tasmota system, and we have to init the variables.
 
 - pt.dirty() Makes the next save to send the data to MQTT even if the server is updated. The difference with persist(tasmota 14.3) is that persist_mqtt detects changes even deep in tables etc. So this function is almost never needed in persist_mqtt.
 
@@ -109,3 +109,5 @@ persist.var1 = 123
 persist.dirty()
 persist.save()
 ```
+## Multiple tasmota modules loading persist_mqtt on the same mqtt server
+Make sure the modules have different topic. Check/change this with the "topic" tasmota console command, or from the Web GUI
