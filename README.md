@@ -25,7 +25,7 @@ theese lines**
 ```
 import persist_mqtt as pt
 pt.exec(/-> load('autoexec_ready.be'))
-# print('pt.ready() =', pt.ready()) # will print false, thre wasn't time to fetch the vars.
+# print( pt.ready() ) # will print false, there wasn't time to fetch the vars.
 ```
 
 The exec() function only loads 'autoexec_ready.be' when the MQTT server sends the stored variables (Usually < 1 sec).
@@ -33,16 +33,13 @@ Any script or code loaded from 'autoexec_ready.be' can use the 'pt' object freel
 Indeed the line
 
 ```
-print('pt.ready() =', pt.ready())
+print( pt.ready() )
 ```
 will print true.
 
 If we load('autoexec_ready.be') outside of exec() the variables will not be there and the script will malfunction.
 
-
-**Note also that we cannot loop around pt.ready() to check if the variables are ready. Berry is single threaded
-and code like "while !pt.ready() end" will not allow the pt module to actually get ready(to receive MQTT messages) and will
-deadlock and freeze the whole ESP32 tasmota system.**
+**Note also that we cannot loop around pt.ready() to check if the variables are ready. Berry is single threaded and code like "while !pt.ready() end" will not allow the pt module to actually get ready(to receive MQTT messages) and will deadlock and freeze the whole ESP32 tasmota system.**
 
 ## Usage
 
