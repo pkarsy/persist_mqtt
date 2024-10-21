@@ -21,17 +21,23 @@ After this and for interactive use (BerryConsole), the module can be loaded as u
 
 **However for use by other scripts special attention is needed.**
 
-**WARNING ! This one is a little tricky. In 'autoexec.be' put
+**WARNING ! This one is a little tricky. In 'autoexec.be' add
 theese lines**
 
 ```
-# import any module or code not related with persist_mqtt
 import persist_mqtt as pt
 pt.exec(/-> load('autoexec_ready.be'))
+# print('pt.ready() =', pt.ready()) # will print false, thre wasn't time to fetch the vars.
 ```
 
 The exec() function only loads 'autoexec_ready.be' when the MQTT server sends the stored variables (Usually < 1 sec).
 Any script or code loaded from 'autoexec_ready.be' can use the 'pt' object freely.
+Indeed the line
+
+```
+print('pt.ready() =', pt.ready())
+```
+will print true.
 
 If we load('autoexec_ready.be') outside of exec() the variables will not be there and the script will malfunction.
 
@@ -41,7 +47,6 @@ and code like "while !pt.ready() end" will not allow the pt module to actually g
 deadlock and freeze the whole ESP32 tasmota system.**
 
 ## Usage
-Works like the persist buildin module
 
 ```
 pt.counter = 1
@@ -51,6 +56,7 @@ pt.save()
 print(pt.counter)
 pt.has('counter',10) # return 10 is var does not exist
 pt.remove('count2') # does nothing if count2 is not defined
+pt.save_every(60) # seconds
 ```
 
 ## Allowed data types
@@ -58,7 +64,7 @@ Only values that can be serialized with json can be saved. Fortunatelly this inc
 - Simple data types like integers, floats, strings
 - tables ie [1,2,"test"] , [1, 2.2 , [3,"4"]]
 - maps with string keys ie {'1':100, '2':[200,'201']} but NOT {1:100, 2:200}
-- About 1000 bytes of json data can be saved. This is OK for the intented purpose which is to store a limited set of frequently changed values such as counters. For bigger staorage needs and data that are not frequently change you can use the persist module
+- About 1000 bytes of json data can be saved. This is OK for the intented purpose which is to store a limited set of frequently changed values such as counters. For bigger storage needs and data that are not frequently change you can use the persist module
 
 ## Saving the variables
 As with persist the values are not saved automatically. Use pt.save() whenever is needed.
@@ -85,21 +91,18 @@ Note that If the project needs mqtt to work, the use of persist_mqtt does not ad
 - Works even with Tasmota "savedata = OFF" command
 
 ## Disadvantages
-- The module cannot be used immediatelly, complicating the import as we've seen above. See below additional ways to address this.
+- The module cannot be used immediatelly, complicating the import as we've seen above.
 - limited space for variables (~1000 bytes in json format)
 - The speed of save() is slow. However mqtt is performed asynchronously (I believe) so the save() actually returns fast, but the data needs some time (imposed by network latency) to reach the server. The other operations pt.var1=val1 etc do not have a speed penaly
-- **Whenever has access to the server can view and change the variables ! BE WARNED !**
+- **Anyone who has access to the server, can view and change the variables ! BE WARNED ! DO NOT USE IT FOR CONFIDENTIAL DATA**
 - if the project does not need an MQTT server or not even network connectivity, the use of this module adds complexity and an unnececary point of failure.
-
-Here are some patterns of importing the module safely.
 
 ## Temporarily using persist_mqtt instead of persist for development
 You may want this to reduce flash wear and/or to be able to view the variables in real time.
 
-'autoexec.be'
+'autoexec_ready.be' See "Imprting the module" above
 ```
-import persist_mqtt as pt
-pt.exec( /-> load('mycode.be'))
+load('mycode.be')
 ```
 
 'mycode.be'
@@ -111,5 +114,3 @@ persist.var1 = 123
 persist.dirty()
 persist.save()
 ```
-
-
