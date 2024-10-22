@@ -83,10 +83,11 @@ Note that If the project needs mqtt to work, the use of persist_mqtt does not ad
 - We can inspect the variables with an mqtt client, by listening the stat/+/PersistMQTT making the module a good debugging tool.
 - We can move the project to another ESP32 module(using the same topic for the new module) and the variables we stored will be there. In this case the initial .zero() is not needed.
 - The save_every(seconds) feature can simplify the code, if we accept the small possibility to miss a very resent variable change (in the event of a unplanned reset/power off).
+- The server checks if the request is valid/complete so it is very difficult for the database to be corrupted. Flash storage generally can be corrupted on crashes.
 - Works even with Tasmota "savedata = OFF" command
 
 ## Disadvantages
-- The module cannot be used immediatelly, complicating the import as we've seen above. If you follow the pattern with 'auteexec_ready.be' however, you are OK. 
+- The module cannot be used immediatelly, complicating the import as we've seen above. If you follow the pattern with 'autoexec_ready.be' however, you are OK. 
 - limited space for variables (~1000 bytes in json format)
 - The speed of save() is slow. However mqtt is seems to be performed asynchronously, so the save() actually returns fast, but the data needs some time (imposed by network latency) to reach the server. The other operations pt.var1=val1 etc do not have a speed penaly
 - **Anyone who has access to the server, can view and change the variables ! BE WARNED ! DO NOT USE IT FOR CONFIDENTIAL DATA**
@@ -113,4 +114,4 @@ persist.save()
 Make sure the modules have different topic. Check/change this with the "topic" tasmota console command, or from the Web GUI
 
 ## You cannot share variables between tasmota modules
-The module does not implement any locking mechanism, neither saves the data in real time. So any attempt to use it for sharing variables will be lead to data loss.
+The module does not implement any locking mechanism, neither saves the data in real time. So any attempt to use it for sharing variables will lead to data loss.
