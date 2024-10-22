@@ -1,11 +1,11 @@
 # persist_mqtt
 
-NOTE : We import the module as "pt" to make the examples easier to write and read
-
 Tasmota berry module analogous to persist, but stores the data to the MQTT server defined in tasmota settings. If the server lives outside LAN, the connection must be secured with TLS. The variables are stored in cleartext, keep this in mind.
 
+NOTE : We import the module as "pt" to make the examples easier to write and read.
+
 ## Installation
-Put the persist_mqtt.be file at the top level of the ESP32xx filesystem
+Put the persist_mqtt.be file at the top level of the ESP32xx filesystem.
 
 ## Importing the module
 The fisrt time the module is loaded write in **Berry Scripting Console**:
@@ -18,9 +18,7 @@ pt.zero() # Creates an empty pool of variables
 After this and for interactive use (BerryConsole), the module can be loaded as usual.
 
 **However for use by other scripts special attention is needed.**
-
-**WARNING ! This one is a little tricky. In 'autoexec.be' add
-theese lines**
+**WARNING ! This one is a little tricky. In 'autoexec.be' add theese lines**
 
 ```
 import persist_mqtt as pt
@@ -46,10 +44,10 @@ If we try to load('autoexec_ready.be') outside of exec() the variables will not 
 ```
 pt.counter = 1
 pt.counter += 1
-pt.tones = [600,700,800]
+pt.tones = [600, 700, 800]
 pt.save()
 print(pt.counter)
-pt.has('counter',10) # return 10 is var does not exist
+pt.has('counter', 10) # return 10 is var does not exist
 pt.remove('count2') # does nothing if count2 is not defined
 pt.save_every(60) # seconds
 ```
@@ -57,9 +55,9 @@ pt.save_every(60) # seconds
 ## Allowed data types
 Only values that can be serialized with json can be saved. Fortunatelly this includes all useful cases.
 - Simple data types like integers, floats, strings
-- tables ie [1,2,"test"] , [1, 2.2 , [3,"4"]]
+- tables ie [1, 2, "test"] , [1, 2.2, [3, "4"]]
 - maps with string keys ie {'1':100, '2':[200,'201']} but NOT {1:100, 2:200}
-- About 1000 bytes of json data can be saved. This is OK for the intented purpose which is to store a limited set of frequently changed values such as counters. For bigger storage needs and data that are not frequently change you can use the persist module
+- About 1000 bytes of json data can be saved. This is OK for the intented purpose, which is to store a limited set of frequently changed values such as counters. For bigger storage needs and data that are not frequently change you can use the persist module.
 
 ## Saving the variables
 As with persist, the values are not saved automatically. Use pt.save() whenever is needed.
@@ -89,14 +87,14 @@ Note that If the project needs mqtt to work, the use of persist_mqtt does not ad
 ## Disadvantages
 - The module cannot be used immediatelly, complicating the import as we've seen above. If you follow the pattern with 'autoexec_ready.be' however, you are OK. 
 - limited space for variables (~1000 bytes in json format)
-- The speed of save() is slow. However mqtt is seems to be performed asynchronously, so the save() actually returns fast, but the data needs some time (imposed by network latency) to reach the server. The other operations pt.var1=val1 etc do not have a speed penaly
+- The speed of save() is slow. However mqtt seems to be performed asynchronously, so the save() actually returns fast, but the data needs some time (imposed by network latency) to reach the server. The other operations ie pt.var1=val1 etc. do not have a speed penaly.
 - **Anyone who has access to the server, can view and change the variables ! BE WARNED ! DO NOT USE IT FOR CONFIDENTIAL DATA**
 - if the project does not need an MQTT server or not even network connectivity, the use of this module adds complexity and an unnececary point of failure.
 
 ## Temporarily use persist_mqtt instead of persist for development
 You may want this to reduce flash wear, to be able to view the variables in real time, or to be able to switch development modules without loosing your data.
 
-'autoexec_ready.be' See "Importing the module" above
+'autoexec_ready.be' See "Importing the module" above.
 ```
 load('mycode.be')
 ```
@@ -111,7 +109,7 @@ persist.dirty()
 persist.save()
 ```
 ## Multiple tasmota modules loading persist_mqtt on the same mqtt server
-Make sure the modules have different topic. Check/change this with the "topic" tasmota console command, or from the Web GUI
+Make sure the modules have different topic. Check/change this with the "topic" tasmota console command, or from the Web GUI.
 
 ## You cannot share variables between tasmota modules
 The module does not implement any locking mechanism, neither saves the data in real time. So any attempt to use it for sharing variables will lead to data loss.
