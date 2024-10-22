@@ -8,7 +8,7 @@ Tasmota berry module analogous to persist, but stores the data to the MQTT serve
 Put the persist_mqtt.be file at the top level of the ESP32xx filesystem
 
 ## Importing the module
-The fisrt time the module is loaded write in BerryScriptingConsole:
+The fisrt time the module is loaded write in **Berry Scripting Console**:
 ```
 import persist_mqtt as pt
 pt.zero() # Creates an empty pool of variables
@@ -37,7 +37,7 @@ print( pt.ready() )
 ```
 will print true.
 
-If we load('autoexec_ready.be') outside of exec() the variables will not be there and the script will malfunction.
+If we try to load('autoexec_ready.be') outside of exec() the variables will not be there and the script will malfunction.
 
 **Note also that we cannot loop around pt.ready() to check if the variables are ready. Berry is single threaded and code like "while !pt.ready() end" will not allow the pt module to actually get ready(to receive MQTT messages) and will deadlock and freeze the whole ESP32 tasmota system.**
 
@@ -55,14 +55,14 @@ pt.save_every(60) # seconds
 ```
 
 ## Allowed data types
-Only values that can be serialized with json can be saved. Fortunatelly this includes all practical cases.
+Only values that can be serialized with json can be saved. Fortunatelly this includes all useful cases.
 - Simple data types like integers, floats, strings
 - tables ie [1,2,"test"] , [1, 2.2 , [3,"4"]]
 - maps with string keys ie {'1':100, '2':[200,'201']} but NOT {1:100, 2:200}
 - About 1000 bytes of json data can be saved. This is OK for the intented purpose which is to store a limited set of frequently changed values such as counters. For bigger storage needs and data that are not frequently change you can use the persist module
 
 ## Saving the variables
-As with persist the values are not saved automatically. Use pt.save() whenever is needed.
+As with persist, the values are not saved automatically. Use pt.save() whenever is needed.
 
 if there is a planned restart (web interface or a "restart 1" command), a save will be performed automatically, but NOT if there is a power outage or a crash. See save_every() for a mitigation to the problem. 
 
@@ -86,14 +86,14 @@ Note that If the project needs mqtt to work, the use of persist_mqtt does not ad
 - Works even with Tasmota "savedata = OFF" command
 
 ## Disadvantages
-- The module cannot be used immediatelly, complicating the import as we've seen above.
+- The module cannot be used immediatelly, complicating the import as we've seen above. If you follow the pattern with 'auteexec_ready.be' however, you are OK. 
 - limited space for variables (~1000 bytes in json format)
-- The speed of save() is slow. However mqtt is performed asynchronously (I believe) so the save() actually returns fast, but the data needs some time (imposed by network latency) to reach the server. The other operations pt.var1=val1 etc do not have a speed penaly
+- The speed of save() is slow. However mqtt is seems to be performed asynchronously, so the save() actually returns fast, but the data needs some time (imposed by network latency) to reach the server. The other operations pt.var1=val1 etc do not have a speed penaly
 - **Anyone who has access to the server, can view and change the variables ! BE WARNED ! DO NOT USE IT FOR CONFIDENTIAL DATA**
 - if the project does not need an MQTT server or not even network connectivity, the use of this module adds complexity and an unnececary point of failure.
 
-## Temporarily using persist_mqtt instead of persist for development
-You may want this to reduce flash wear and/or to be able to view the variables in real time.
+## Temporarily use persist_mqtt instead of persist for development
+You may want this to reduce flash wear, to be able to view the variables in real time, or to be able to switch development modules without loosing your data.
 
 'autoexec_ready.be' See "Importing the module" above
 ```
@@ -111,3 +111,6 @@ persist.save()
 ```
 ## Multiple tasmota modules loading persist_mqtt on the same mqtt server
 Make sure the modules have different topic. Check/change this with the "topic" tasmota console command, or from the Web GUI
+
+## You cannot share variables between tasmota modules
+The module does not implement any locking mechanism, neither saves the data in real time. So any attempt to use it for sharing variables will be lead to data loss.
