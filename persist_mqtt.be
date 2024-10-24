@@ -29,8 +29,10 @@ pt_module.init = def (m)
     static _errmsg = 'Not ready' # To avoid repeating the same err message across the code
     var _save_delay
     var _save_is_pending
+    var _debug
 
     def init()
+      self._debug = false
       self._save_delay = 1000 # ms
       self._save_is_pending = false
       self._pool = {}
@@ -107,7 +109,7 @@ pt_module.init = def (m)
     end
 
     def save()
-      print('pt.save()')
+      if self._debug print('pt.save()') end
       if ! self._module_ready print(PersistMQTT._errmsg) return end
       tasmota.remove_timer(PersistMQTT._unique_id)
       self._save_is_pending = false
