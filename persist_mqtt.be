@@ -2,10 +2,10 @@
 #
 # WARNING ! To use the persist_mqtt module use something like
 # import persist_mqtt as pt
-# pt.exec( /-> load('mycode.be') )
+# pt.exec( /-> load('autoexec_ready.be') )
 # See README for explanation
 
-# Version 0.8.1
+# Version 0.8.5
 
 var pt_module = module("persist_mqtt")
 
@@ -27,15 +27,19 @@ pt_module.init = def (m)
     var _exec_callback # will be called when we get the retained message
     static _save_rule = 'System#Save' # rule to save the data on planned restarts
     static _errmsg = 'Not ready' # To avoid repeating the same err message across the code
+    var _save_delay
+    var _save_is_pending
 
     def init()
+      self._save_delay = 1000 # ms
+      self._save_is_pending = false
       self._pool = {}
       mqtt.unsubscribe(PersistMQTT._topic)
       tasmota.remove_timer(PersistMQTT._unique_id)
       self._module_ready = false
       mqtt.subscribe(
         PersistMQTT._topic,
-        /_topic_, _idx_, retained_msg -> self._mqtt_callback(retained_msg)
+        /_topic_, _idx_, msg -> self._mqtt_callback(msg) # we are interest on the retained message only
       )
       # On a planned restart (restart 1 or GUI restart) a pt.save() is performed
       tasmota.remove_rule(PersistMQTT._save_rule, PersistMQTT._unique_id)
@@ -56,25 +60,51 @@ pt_module.init = def (m)
 
     def member(myvar) # Implements of using pt.myvar
       if ! self._module_ready print(PersistMQTT._errmsg) return end
-      return self._pool.find(myvar)
+      var value = self._pool.find(myvar)
+      # For int real and string there is no need to save, they are immutable
+      if type(value)!='instance' return value end
+      self._schedule_save()
+      return value
     end
 
     def setmember(myvar, value) # Implements "pt.myvar = myvalue"
       if ! self._module_ready print(PersistMQTT._errmsg) return end
+      #var oldval = self._pool.find(myvar)
+      #if oldval == value return end
       if value == nil
         self._pool.remove(myvar)
       else
         self._pool[myvar]=value
       end
+      self._schedule_save()
+    end
+
+    def _schedule_save()
+      if self._save_delay < 0 return end
+      if self._save_is_pending return end
+      tasmota.remove_timer(PersistMQTT._unique_id) # Not needed ?
+      tasmota.set_timer(
+        int(self._save_delay),
+        /->self.save(),
+        PersistMQTT._unique_id
+      )
+      self._save_is_pending = true
+
+      #
+      #if self._save_delay < 0 return value end
+      #if self._save_is_pending return value end
+      #tasmota.remove_timer(PersistMQTT._unique_id)
+      #tasmota.set_timer(self._save_delay, /->self.save(), PersistMQTT._unique_id)
+      #self._save_is_pending = true
     end
 
     def remove(myvar)
       self._pool.remove(myvar)
     end
 
-    def has(myvar)
+    def has(myvar, fallback_val)
       if ! self._module_ready print(PersistMQTT._errmsg) return end
-      return self._pool.has(myvar)
+      return self._pool.has(myvar, fallback_val)
     end
 
     def dirty() # The next save() will actually send mqtt data
@@ -86,7 +116,10 @@ pt_module.init = def (m)
     end
 
     def save()
+      print('pt.save()')
       if ! self._module_ready print(PersistMQTT._errmsg) return end
+      tasmota.remove_timer(PersistMQTT._unique_id)
+      self._save_is_pending = false
       var poolser = json.dump(self._pool)
       if poolser == self._mqttout return end
       self._mqttout = poolser
@@ -95,8 +128,8 @@ pt_module.init = def (m)
 
     ### functions that are not present in persist buildin module ###
 
-    def _mqtt_callback(retained_msg) # Get the values from the mqtt server
-      var jsonmap = json.load(retained_msg)
+    def _mqtt_callback(msg) # Get the retained msg from the mqtt server
+      var jsonmap = json.load(msg)
       if classname(jsonmap)=='map'
         self._pool = jsonmap
       else
@@ -105,7 +138,7 @@ pt_module.init = def (m)
       end
       mqtt.unsubscribe(PersistMQTT._topic) # we are interested only for the retained message
       self._module_ready = true
-      self._mqttout = retained_msg # no need to send this message to the server, there is already there
+      self._mqttout = msg # no need to send this message to the server, there is already there
       if type(self._exec_callback) == 'function'
         self._exec_callback()
       end
@@ -135,16 +168,25 @@ pt_module.init = def (m)
       return self._module_ready
     end
 
-    def save_every(sec)
-      tasmota.remove_timer(PersistMQTT._unique_id)
-      if sec < 5 print('Auto save is disabled')  return end
+    #- def save_every(sec)
+      print('This function is disabled, see save_save_delay')
+      return
+      #tasmota.remove_timer(PersistMQTT._unique_id)
+      #if sec < 5 print('Auto save is disabled')  return end
       # print('save_every(' .. sec .. ')') end
+      #self.save()
+      #tasmota.set_timer(
+      #  sec*1000,
+      #  /->self.save_every(sec),
+      #  PersistMQTT._unique_id
+      #)
+    end -#
+
+    def savedelay(sec)
+      if type(sec)!='int' && type(sec)!='real' return self._save_delay end
       self.save()
-      tasmota.set_timer(
-        sec*1000,
-        /->self.save_every(sec),
-        PersistMQTT._unique_id
-      )
+      if sec<0 self._save_delay = -1 tasmota.remove_timer(PersistMQTT._unique_id) return end
+      self._save_delay = int(1000* sec)
     end
 
     def selfupdate()
