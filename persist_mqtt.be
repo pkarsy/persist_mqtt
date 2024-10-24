@@ -5,7 +5,7 @@
 # pt.exec( /-> load('autoexec_ready.be') )
 # See README for explanation
 
-# Version 0.8.5
+# Version 0.8.7
 
 var pt_module = module("persist_mqtt")
 
@@ -159,25 +159,11 @@ pt_module.init = def (m)
       return self._module_ready
     end
 
-    #- def save_every(sec)
-      print('This function is disabled, see save_save_delay')
-      return
-      #tasmota.remove_timer(PersistMQTT._unique_id)
-      #if sec < 5 print('Auto save is disabled')  return end
-      # print('save_every(' .. sec .. ')') end
-      #self.save()
-      #tasmota.set_timer(
-      #  sec*1000,
-      #  /->self.save_every(sec),
-      #  PersistMQTT._unique_id
-      #)
-    end -#
-
     def savedelay(sec)
       if type(sec)!='int' && type(sec)!='real' return self._save_delay end
       self.save()
       if sec<0 self._save_delay = -1 tasmota.remove_timer(PersistMQTT._unique_id) return end
-      self._save_delay = int(1000* sec)
+      self._save_delay = int(1000*sec)
     end
 
     def selfupdate()
