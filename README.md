@@ -42,7 +42,7 @@ If we try to load('autoexec_ready.be') outside of exec() the variables will not 
 pt.counter = 1
 pt.counter += 1
 pt.tones = [600, 700, 800]
-# pt.save() generally in not needed unless you disable autosaves
+# pt.save() generally not needed, unless you disable autosaves with savedelay(-1)
 print(pt.counter)
 pt.find('counter2', 10) # return 10 is var does not exist
 pt.remove('counter2') # does nothing if count2 is not defined
