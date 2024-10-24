@@ -42,16 +42,16 @@ If we try to load('autoexec_ready.be') outside of exec() the variables will not 
 pt.counter = 1
 pt.counter += 1
 pt.tones = [600, 700, 800]
-pt.save()
+# pt.save() generally in not needed unless you disable autosaves
 print(pt.counter)
-pt.has('counter', 10) # return 10 is var does not exist
-pt.remove('count2') # does nothing if count2 is not defined
-pt.count2 = nil # Exactly the same as above
+pt.find('counter2', 10) # return 10 is var does not exist
+pt.remove('counter2') # does nothing if count2 is not defined
+pt.counter2 = nil # Exactly the same as above
 ```
 
 ## Allowed data types
-Only values that can be serialized with json can be saved. Fortunatelly this includes all/most useful cases.
-- Simple data types like integers, floats, strings. 
+Only values that can be serialized with json can be saved. Fortunatelly this includes most useful cases.
+- Simple data types like integers, floats, strings.
 - tables ie [1, 2, "test"] , [1, 2.2, [3, "4"]]
 - maps with string keys ie {'1':100, '2':[200,'201']} but NOT {1:100, 2:200}
 - The bytes data object cannot be saved, it is converted to a string
@@ -60,19 +60,20 @@ Only values that can be serialized with json can be saved. Fortunatelly this inc
 It is harder(more cpu cycles) for the module to detect changes inside tables and maps, most probably however you wont notice anything.
 
 ## Saving the variables
-Contarary to buildin persist the variables autosave in persist_mqtt.
+Contarary to buildin persist, the variables autosave in persist_mqtt.
 Given that the an MQTT server does not suffer from wear like Flash, any change will be send to the MQTT server in a few ms timeframe. If you prefer the behaviour of persist you can
-see save_delay(-1)
+use pt.savedelay(-1)
 Even with autosaves disabled a planned restart (web interface or a "restart 1" command) will trigger a save. Of course a power outage or a crash can lead to data loss, so most of the time you probably prefer to have autosaves enabled. Here is a summary of differences
-```
-persist             persist_mqtt
-no autosaves        yes but can be disabled with save_delay(-1)
-save() cannot see changes inside tables    save() detects changes inside tables and maps
-can be used immediately after import      Needs some procedure see #inporting
-very fast           limited by the network latency and the fact that try harder to detect changes
-flash wear          unlimited writes (only limit is the network usage)
-variables can be seen by accessing the filesystem     can be viwed in real time with an mqtt client
-```
+
+| persist       |      persist_mqtt |
+| --------------|-------------------|
+| no autosaves  | yes but can be disabled with save_delay(-1) |
+| save() cannot see changes inside tables   | save() detects changes inside tables and maps |
+|can be used immediately after import   |   Needs some procedure see #inporting |
+| very fast     |      limited by the network latency and the fact that try harder to detect changes |
+| flash wear    |      unlimited writes (only limit is the network usage) |
+| variables can be seen by accessing the filesystem  |   can be viwed in real time with an mqtt client |
+
 ### Methods not present, or working differently than buildin persist
 
 - pt.savedelay(timeSec=real) Schedules a save(to MQTT) at most timeSec seconds in the future. It saves the values IF there are changes to be pushed. Note that persist_mqtt will detect data changes even deep inside tables or maps. Any value <0 will disable auto-saves. The default is 0 and immediatelly triggers a mqtt push. If we have lots of updates and we want to reduce the number of pushes to the server we can to a
