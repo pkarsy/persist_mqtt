@@ -69,8 +69,6 @@ pt_module.init = def (m)
 
     def setmember(myvar, value) # Implements "pt.myvar = myvalue"
       if ! self._module_ready print(PersistMQTT._errmsg) return end
-      #var oldval = self._pool.find(myvar)
-      #if oldval == value return end
       if value == nil
         self._pool.remove(myvar)
       else
@@ -89,13 +87,6 @@ pt_module.init = def (m)
         PersistMQTT._unique_id
       )
       self._save_is_pending = true
-
-      #
-      #if self._save_delay < 0 return value end
-      #if self._save_is_pending return value end
-      #tasmota.remove_timer(PersistMQTT._unique_id)
-      #tasmota.set_timer(self._save_delay, /->self.save(), PersistMQTT._unique_id)
-      #self._save_is_pending = true
     end
 
     def remove(myvar)

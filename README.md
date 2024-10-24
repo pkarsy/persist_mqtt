@@ -44,9 +44,11 @@ pt.counter += 1
 pt.tones = [600, 700, 800]
 # pt.save() generally not needed, unless you disable autosaves with savedelay(-1)
 print(pt.counter)
+pt.has('counter3')
+pt.counter3 == nil # The same as above
 pt.find('counter2', 10) # return 10 is var does not exist
-pt.remove('counter2') # does nothing if count2 is not defined
-pt.counter2 = nil # Exactly the same as above
+pt.remove('counter2') # does nothing if counter2 is not defined
+pt.counter2 = nil # the same as above
 ```
 
 ## Allowed data types
