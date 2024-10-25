@@ -1,11 +1,13 @@
-# WARNING ! No guaranties about losing important data, see MIT LICENCE
-#
-# WARNING ! To use the persist_mqtt module use something like
-# import persist_mqtt as pt
-# pt.exec( /-> load('autoexec_ready.be') )
-# See README for explanation
+#-
+WARNING ! No guaranties about losing important data, see MIT LICENCE
+WARNING ! To use the persist_mqtt module use something like
 
-# Version 0.8.7
+import persist_mqtt as pt
+pt.exec( /-> load('autoexec_ready.be') )
+
+See README for explanation
+Version 0.8.8
+-#
 
 var pt_module = module("persist_mqtt")
 
@@ -26,19 +28,19 @@ pt_module.init = def (m)
     static _unique_id = 0xbeef # a unique value. It is used to be able to remove a timer we've created
     var _exec_callback # will be called when we get the retained message
     static _save_rule = 'System#Save' # rule to save the data on planned restarts
-    static _errmsg = 'Not ready' # To avoid repeating the same err message across the code
-    var _save_delay
-    var _save_is_pending
-    var _debug
+    static _errmsg = 'Not ready. The module did not get the variables from the server' # To avoid repeating the same err message across the code
+    var _save_delay # Controls autosaves see README
+    var _save_is_pending # Used by _schedule_save() to not trigger another save() if one is pending
+    var _debug # Controls some debugging messages. May be removed finally
 
     def init()
       self._debug = false
-      self._save_delay = 1000 # ms
+      self._save_delay = 0 # ms
       self._save_is_pending = false
       self._pool = {}
-      mqtt.unsubscribe(PersistMQTT._topic)
-      tasmota.remove_timer(PersistMQTT._unique_id)
-      self._module_ready = false
+      mqtt.unsubscribe(PersistMQTT._topic) # in case of reloading
+      tasmota.remove_timer(PersistMQTT._unique_id) # in case of reloading
+      self._module_ready = false # it will become ready when we fetch the variables
       mqtt.subscribe(
         PersistMQTT._topic,
         /_topic_, _idx_, msg -> self._mqtt_callback(msg) # we are interest on the retained message only
@@ -150,10 +152,14 @@ pt_module.init = def (m)
       end
       if self._module_ready
         # executes the function immediatelly
-        cb()
+        if self._debug print('exec() immediatelly') end
+        tasmota.set_timer(0,cb)
+        #return true
       else
         # postpone the execution when the variables are feched from the broker
+        if self._debug print('exec() when ready') end
         self._exec_callback = cb
+        #return false
       end
     end
 

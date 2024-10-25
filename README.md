@@ -1,24 +1,31 @@
 # persist_mqtt
+STILL A LOT OF CHANGES, WAIT FOR THIS MESSAGE TO DISSAPEAR
 
 Tasmota berry module analogous to persist, but stores the data to the MQTT server. If the server lives outside LAN, the connection must be secured with TLS. The variables are stored in cleartext, keep this in mind.
 
-NOTE : We import the module as "pt" to make the examples easier to write and read.
+**NOTE :** We import the module as "pt" to make the examples easier to write and read.
 
 ## Installation
 Put the persist_mqtt.be file at the top level of the ESP32xx filesystem.
 
-## Importing the module
-The fisrt time the module is loaded write in **Berry Scripting Console**:
+## Importing the module for the first time
+Write in **Berry Scripting Console**:
 ```
 import persist_mqtt as pt
 pt.zero() # Creates an empty pool of variables
 ```
 **Do not skip the pt.zero() step, the module will not work !**
 
-After this and for interactive use (BerryConsole), the module can be loaded as usual.
+After this and for interactive use (Berry Scripting Console), the module can be loaded as usual.
 
-**However for use by other scripts special attention is needed.**
-**WARNING ! This one is a little tricky. In 'autoexec.be' add theese lines**
+**IMPORTANT !**
+
+For use by automatically loaded code, special attention is needed. When the module is imported it needs some time to fetch(asynchronously, after the autoexec.be is finished) the variables from the server. any code trying to use the module will find it in unusable state (all variables are nil).
+
+
+**SOLUTION**
+
+In 'autoexec.be' add theese lines
 
 ```
 import persist_mqtt as pt
@@ -27,12 +34,12 @@ pt.exec(/-> load('autoexec_ready.be'))
 
 The exec() function only loads 'autoexec_ready.be' when the MQTT server sends the stored variables (Usually < 1 sec).
 Any script or code loaded from 'autoexec_ready.be' can use the 'pt' object freely. Write for example
+'autoexec_ready.be'
 ```
 print( pt.ready() ) # will print true
+pt.bootcounter += 1
+load('uses_pt.be')
 ```
-
-
-If we try to load('autoexec_ready.be') outside of exec() the variables will not be there and the script will malfunction.
 
 **Note also that we cannot loop around pt.ready() to check if the variables are ready. Berry is single threaded and code like "while !pt.ready() end" will not allow the pt module to actually get ready(to receive MQTT messages) and will deadlock and freeze the whole ESP32 tasmota system.**
 
@@ -69,10 +76,11 @@ Even with autosaves disabled a planned restart (web interface or a "restart 1" c
 
 | persist       |      persist_mqtt |
 | --------------|-------------------|
-| no autosaves  | yes but can be disabled with save_delay(-1) |
+| no autosaves  | yes. Can be disabled with save_delay(-1) |
+|no network is needed|needs network and MQTT server|
 | save() cannot see changes inside tables   | save() detects changes inside tables and maps |
-|can be used immediately after import   |   Needs some procedure see #inporting |
-| very fast     |      limited by the network latency and the fact that try harder to detect changes |
+|can be used immediately after import   |   Needs some procedure see above |
+| very fast     |      limited by the network latency and the fact that tries harder to detect changes |
 | flash wear    |      unlimited writes (only limit is the network usage) |
 | variables can be seen by accessing the filesystem  |   can be viwed in real time with an mqtt client |
 
@@ -103,6 +111,7 @@ Note that If the project needs mqtt to work, the use of persist_mqtt does not ad
 - The speed of save() is slow. However mqtt seems to be performed asynchronously, so the save() actually returns fast, but the data needs some time (imposed by network latency) to reach the server.
 - **Anyone who has access to the server, can view and change the variables ! BE WARNED ! DO NOT USE IT FOR CONFIDENTIAL DATA**
 - if the project does not need an MQTT server or not even network connectivity, the use of this module adds complexity and an unnececary point of failure.
+- Somewhat overengineered. A lot more options than the original persist module.
 
 ## Temporarily use persist_mqtt instead of persist for development
 
