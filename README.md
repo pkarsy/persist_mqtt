@@ -10,7 +10,7 @@ Put the "pt.be" file at the top level of the ESP32xx filesystem.
 ## Initializing the module for the first time
 Write in **Berry Scripting Console**:
 ```berry
-> import  pt
+> import pt
 > pt.initvars() # Creates an empty pool of variables.
 ```
 **Do not skip the pt.initvars() step, the module will not work ! This step must to be done only once. Do not put a pt.initvars() in a script**
