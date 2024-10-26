@@ -58,23 +58,17 @@ pt_module.init = def (m)
 
     def setmember(myvar, myvalue) # Implements "pt.myvar = myvalue"
       if ! self._ready print(PersistMQTT._errmsg) return end
-      #if myvalue == nil
-      #  if self._pool.find(myvar) == nil return end
-      #  self._pool.remove(myvar)
-      #else
       self._pool[myvar]=myvalue
-      #end
       self._dirty = true
     end
 
-    def remove(myvar) # depends on setmember
-      #self.setmember(myvar, nil)
+    def remove(myvar)
       self._pool.remove(myvar)
       self._dirty = true
     end
 
     def has(myvar)
-      #if ! self.ready() print(PersistMQTT._errmsg) return end
+      # print(PersistMQTT._errmsg)
       return self._pool.has(myvar)
     end
 
@@ -87,7 +81,7 @@ pt_module.init = def (m)
     end
 
     def save()
-      #if self._debug print('pt.save()') end
+      # print('pt.save()')
       if !self._ready print(PersistMQTT._errmsg) return end
       if !self._dirty return end
       mqtt.publish(PersistMQTT._topic, json.dump(self._pool), true)
