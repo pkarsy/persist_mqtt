@@ -23,13 +23,15 @@ pt_module.init = def (m)
     var _exec_callback # will be used when we get the retained message
     static _save_rule = 'System#Save' # rule to save the data on planned restarts
     static _errmsg = 'Not ready. The module did not get the variables from the server' # To avoid repeating the same err message across the code
-    var _debug # Controls some debugging messages. May be removed finally
+    #var _debug # Controls some debugging messages. May be removed
     var _dirty
+    var _ready
 
     def init()
-      self._dirty = false
+      self._ready = false
+      #self._dirty = false
       self._exec_callback = [] 
-      self._debug = false
+      #self._debug = false
       self._pool = {}
       mqtt.unsubscribe(PersistMQTT._topic) # in case of reloading
       mqtt.subscribe(
@@ -41,65 +43,73 @@ pt_module.init = def (m)
       tasmota.add_rule(PersistMQTT._save_rule, /->self.save(), PersistMQTT._unique_id)
     end
 
-    ### functions that are somewhat equivalent to persist functions ###
+    ### functions that work as the stock persist ###
 
-    def zero(force) # The persist buildin does not use the true/false argument
-      if self.ready() && force!=true
-        print('Mqtt is already OK. To force clearing the variables, do a .zero(true)')
-        return
-      end
+    def zero() # The persist buildin does not use the true/false argument
+      if !self._ready print(PersistMQTT._errmsg) return end
       self._pool = {}
-      mqtt.publish(PersistMQTT._topic, json.dump(self._pool) , true)
+      self._dirty = true
+      print('All vars are cleared, do a save() to also clear the variables on server, or hw reset/poweroff to avoid this.')
     end
 
-    def member(myvar) # Implements of using pt.myvar
-      if self._debug print('member', myvar) end
-      if ! self.ready() print(PersistMQTT._errmsg) return end
+    def member(myvar) # Implements of using "pt.myvar"
       return self._pool.find(myvar)
     end
 
-    def setmember(myvar, value) # Implements "pt.myvar = myvalue"
-      if self._debug print('setmember', myvar, value) end
-      if ! self.ready() print(PersistMQTT._errmsg) return end
-      if value == nil
-        self.remove(myvar)
-        return
-      end
-      self._pool[myvar]=value
+    def setmember(myvar, myvalue) # Implements "pt.myvar = myvalue"
+      if ! self._ready print(PersistMQTT._errmsg) return end
+      #if myvalue == nil
+      #  if self._pool.find(myvar) == nil return end
+      #  self._pool.remove(myvar)
+      #else
+      self._pool[myvar]=myvalue
+      #end
       self._dirty = true
     end
 
-    def remove(myvar)
-      if ! self.ready() print(PersistMQTT._errmsg) return end
-      var value = self.find(myvar)
-      if value == nil return end
+    def remove(myvar) # depends on setmember
+      #self.setmember(myvar, nil)
       self._pool.remove(myvar)
       self._dirty = true
     end
 
     def has(myvar)
-      if ! self.ready() print(PersistMQTT._errmsg) return end
+      #if ! self.ready() print(PersistMQTT._errmsg) return end
       return self._pool.has(myvar)
     end
 
     def dirty() # The next save() will actually send mqtt data
-      if ! self.ready() print(PersistMQTT._errmsg) return end
       self._dirty = true
     end
 
-    def find(k, fbval)
-      return self._pool.find(k, fbval)
+    def find(myvar, fallback_val)
+      return self._pool.find(myvar, fallback_val)
     end
 
     def save()
-      if self._debug print('pt.save()') end
-      if !self.ready() print(PersistMQTT._errmsg) return end
+      #if self._debug print('pt.save()') end
+      if !self._ready print(PersistMQTT._errmsg) return end
       if !self._dirty return end
       mqtt.publish(PersistMQTT._topic, json.dump(self._pool), true)
       self._dirty = false
     end
 
     ### functions that are not present in persist buildin module ###
+
+    def values()
+      return json.dump(self._pool)
+    end
+
+    def initvars()
+      if self._ready
+        print('The module is ready')
+        return
+      end
+      self._pool ={} # not needed
+      self._dirty = true
+      self.save()
+      print('Init with empty pool')
+    end
 
     def _receive_cb(msg) # Get the retained msg from the mqtt server
       var jsonmap = json.load(msg)
@@ -113,8 +123,8 @@ pt_module.init = def (m)
       for f:self._exec_callback
         tasmota.set_timer(0,f)
       end
-      # nil informs the exec() function that no callback is pending
-      self._exec_callback = nil
+      self._exec_callback = []
+      self._ready = true
     end
 
     def exec(cb) # calls the "cb" function/closure when the variables are feched from the server
@@ -122,24 +132,25 @@ pt_module.init = def (m)
         print('Needs a callback function, got', type(cb) )
         return
       end
-      if self._exec_callback == nil
+      if self._ready
         # executes the function in the next tick
-        if self._debug print('exec() immediatelly') end
+        # print('exec() immediatelly') end
         tasmota.set_timer(0,cb)
       else
-        # postpone the execution when the variables are feched from the broker
-        if self._debug print('exec() when ready') end
+        # postpone the execution for the variables to become ready
+        # print('exec() when ready') end
         self._exec_callback.push(cb)
       end
     end
 
     def ready() # true when vars are feched. You cannot use it in a waiting loop, see the README
-      return self._exec_callback == nil
+      return self._ready
     end
 
+      # TODO string
     def selfupdate()
       self.save()
-      var fn = '/persist_mqtt.be'
+      var fn = '/pt.be'
       var fd=open(fn)
       var lbytes = fd.readbytes()
       fd.close() fd = nil
