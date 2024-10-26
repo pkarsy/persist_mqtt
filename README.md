@@ -9,7 +9,7 @@ Put the "pt.be" file at the top level of the ESP32xx filesystem.
 
 ## Initializing the module for the first time
 Write in **Berry Scripting Console**:
-```
+```berry
 > import  pt
 > pt.initvars() # Creates an empty pool of variables.
 ```
@@ -26,7 +26,7 @@ For use by other scrips or "autoxec.be", **special attention is needed**. When t
 
 In 'autoexec.be' add theese lines
 
-```
+```berry
 import  pt
 pt.exec(/-> load('myscript1.be'))  # will be executed only after the variables are ready
 pt.exec( /-> load('myscript2.be')) # both scripts can use the "pt" object freely
@@ -36,7 +36,7 @@ pt.exec( /-> load('myscript2.be')) # both scripts can use the "pt" object freely
 ## Method 2
 Works without relying on "autoexec.be" exec(), and without even including "pt" in the global namespace. If the script needs to be started from "autoexec.be", load the script as usual with load('mycode.be'). Or just paste the code inside autoexec.be
 
-```
+```berry
 # do-end is optional, does not allow the BootCount() to be visible
 # in the global namespace. For this particular case this is optimal.
 do 
@@ -58,7 +58,7 @@ end
 The line containing "if !pt.ready()..." does all the magic, basically the function is reexecuted when the variables are ready.
 
 ## Usage (Identical with persist)
-```
+```berry
 pt.counter = 1
 pt.save() # works ok
 ...
