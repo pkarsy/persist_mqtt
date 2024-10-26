@@ -57,7 +57,7 @@ end
 ```
 The line containing "if !pt.ready()..." does all the magic, basically the function is reexecuted when the variables are ready.
 
-## Usage
+## Usage (Identical with persist)
 ```
 pt.counter = 1
 pt.save() # works ok
@@ -128,7 +128,7 @@ pt.save() like persist.save() is the responsibility of the developer. On a plann
 
 ## How to temporarily use persist_mqtt(pt) instead of persist for development
 
-You may want this to reduce flash wear when writing a new script, or to be able to view the variables in real time.
+You may want this to reduce flash wear when writing a new berry program, or to be able to view the variables in real time.
 
 ```
 def myfunc()
