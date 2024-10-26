@@ -37,9 +37,7 @@ pt.exec( /-> load('myscript2.be')) # both scripts can use the "pt" object freely
 Works without relying on "autoexec.be" exec(), and without even including "pt" in the global namespace. If the script needs to be started from "autoexec.be", load the script as usual with load('mycode.be'). Or just paste the code inside autoexec.be
 
 ```berry
-# do-end is optional, does not allow the BootCount() to be visible
-# in the global namespace. For this particular case this is optimal.
-do 
+do # optional, hides BootCount() from the global namespace
   def BootCount()
     import pt
     if !pt.ready() pt.exec(BootCount) return end
