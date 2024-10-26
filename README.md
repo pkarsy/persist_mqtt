@@ -130,7 +130,7 @@ pt.save() like persist.save() is the responsibility of the developer. On a plann
 
 You may want this to reduce flash wear when writing a new berry program, or to be able to view the variables in real time.
 
-```
+```berry
 def myfunc()
   # import persist
   import pt as persist
