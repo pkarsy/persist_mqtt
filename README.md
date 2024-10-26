@@ -1,7 +1,5 @@
 # persist_mqtt
 
-**STILL A LOT OF CHANGES, WAIT FOR THIS MESSAGE TO DISSAPEAR BEFORE YOU CAN USE IT**
-
 Tasmota berry module analogous to persist, but stores the data to the MQTT server. If the server lives outside LAN, the connection must be secured with TLS. The variables are stored in cleartext, keep this in mind.
 
 ## Installation
@@ -13,12 +11,12 @@ Write in **Berry Scripting Console**:
 > import  pt
 > pt.zero() # Creates an empty pool of variables.
 ```
-**Do not skip the pt.zero() step, the module will not work ! This step needs to be done only once. Do not put a pt.zero() in a script**
+**Do not skip the pt.zero() step, the module will not work ! This step must to be done only once. Do not put a pt.zero() in a script**
 
 After this and for interactive use (Berry Scripting Console), the module can be loaded as usual.
 
 **IMPORTANT !**
-For use by automatically loaded code, special attention is needed. When the module is imported it needs some time to fetch(asynchronously, after the script is finished) the variables from the server. Any code trying to use the module in this timeframe, will find it in an unusable state (all variables are nil).
+For use by automatically loaded code, special attention is needed. When the module is imported it needs some time to fetch(asynchronously) the variables from the server. Any code trying to use the module in this timeframe, will find it in an unusable state (all variables will be nil).
 
 **Note that we cannot just wait pt.ready() to become true.** Berry is single threaded, and code like "while !pt.ready() end" will not allow the pt module to actually get ready(to receive MQTT messages) and will deadlock and freeze the whole ESP32 tasmota system.
 
@@ -27,17 +25,17 @@ For use by automatically loaded code, special attention is needed. When the modu
 In 'autoexec.be' add theese lines
 
 ```
-import persist_mqtt as pt
+import  pt
 pt.exec(/-> load('myscript1.be'))  # will be executed only after the variables are fetched
 pt.exec( /-> load('myscript2.be')) # both scripts can use the "pt" object freely
                                    # The sripts will be executed after autoexec finishes
 ```
 
 ## Method 2 (better)
-Works without rely on "autoexec.be" exec() trick, and without even importing pt in the global namespace. If the script needs to be started from "autoexec.be", load the script as usual with load('mycode.be'). Or just paste the code inside autoexec.be
+Works without relying on "autoexec.be" exec() trick, and without even importing pt in the global namespace. If the script needs to be started from "autoexec.be", load the script as usual with load('mycode.be'). Or just paste the code inside autoexec.be
 
 ```
-do # do-end is optional, does not allow the variables sto leak to the global namespace.
+do # do-end is optional, does not allow the BootCount() to be visible in the global namespace.
   def BootCount()
     import pt
     if !pt.ready() pt.exec(BootCount) return end
@@ -66,7 +64,7 @@ pt.save()
 ...
 ...
 pt.counter += 1
-pt.save() # will trigger a push message
+pt.save() # works ok
 ...
 ...
 pt.tones = [600, 700, 800]
@@ -83,7 +81,8 @@ pt.save() # without .dirty() will not save the variable
 pt.has('counter') # -> true/false
 pt.remove('counter') # does nothing if var "pt.counter" is not defined
 pt.counter == nil # The same as pt.remove('counter')
-pt.find('counter') # returns nil is var does not exist
+pt.counter # returns nil is 'counter' is not defined
+pt.find('counter') # the same as above
 pt.find('counter', 10) # returns 10 is var does not exist
 ```
 
