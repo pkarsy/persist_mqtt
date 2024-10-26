@@ -136,8 +136,7 @@ def myfunc()
   import pt as persist
   if !pt.ready() pt.exec(myfunc) return end
   # no need to change the code
-  persist.var1 = 123
-  persist.var2[1] += 1
+  persist.var1 += 1
   persist.save()
 end
 ```
