@@ -32,7 +32,7 @@ pt_module.init = def (m)
       #self._dirty = false
       self._exec_callback = [] 
       #self._debug = false
-      self._pool = {}
+      #self._pool = {}
       mqtt.unsubscribe(PersistMQTT._topic) # in case of reloading
       mqtt.subscribe(
         PersistMQTT._topic,
@@ -96,12 +96,10 @@ pt_module.init = def (m)
 
     def initvars()
       if self._ready
-        print('The module is ready')
+        print('The vars are already loaded')
         return
       end
-      self._pool ={} # not needed
-      self._dirty = true
-      self.save()
+      mqtt.publish(PersistMQTT._topic, "{}", true)
       print('Init with empty pool')
     end
 
