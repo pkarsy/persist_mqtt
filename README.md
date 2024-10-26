@@ -31,7 +31,7 @@ pt.exec( /-> load('myscript2.be')) # both scripts can use the "pt" object freely
                                    # The sripts will be executed after autoexec finishes
 ```
 
-## Method 2 (better)
+## Method 2
 Works without relying on "autoexec.be" exec() trick, and without even importing pt in the global namespace. If the script needs to be started from "autoexec.be", load the script as usual with load('mycode.be'). Or just paste the code inside autoexec.be
 
 ```
@@ -48,7 +48,7 @@ do # do-end is optional, does not allow the BootCount() to be visible in the glo
     print('BootCount =', pt.BootCount)
   end
 
-  BootCount()
+  BootCount() # Will may be executed asynchronously
 end
 ```
 The line containing "if !pt.ready()..." does all the magic, basically the function is reexecuted when the variables are feched.
