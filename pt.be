@@ -166,7 +166,7 @@ pt_module.init = def (m)
       fd = open(fn, 'w')
       fd.write(remote_script)
       fd.close()
-      print('Got update from github. Reset the module, to use the new code')
+      print('Got update from github. Reset the module, to use the new code.')
     end
 
     def deinit() # for debugging
