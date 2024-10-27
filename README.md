@@ -112,7 +112,7 @@ pt.save() like persist.save() is the responsibility of the developer. On a plann
 
 - **pt.ready()** and **pt.exec(func)**. Used when importing the module, as we've seen.
 
-- **pt.values** For debugging purposes, return the full database of vars as a json string.
+- **pt.values()** For debugging purposes, return the full database of vars as a json string.
 
 - **pt.selfupdate()** fetches an updated (if it exists) persist_mqtt module from the github page. For interactive use only.
 
