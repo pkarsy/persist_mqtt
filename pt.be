@@ -41,7 +41,7 @@ pt_module.init = def (m)
 
     ### functions that work as the stock persist ###
 
-    def zero() # The persist buildin does not use the true/false argument
+    def zero()
       if !self._ready print(PersistMQTT._errmsg) return end
       self._pool = {}
       self._dirty = true
@@ -96,7 +96,7 @@ pt_module.init = def (m)
       print('Init with empty pool')
     end
 
-    def _receive_cb(msg) # Get the retained msg from the mqtt server
+    def _receive_cb(msg) # For internal use. Get the retained msg from the mqtt server
       var jsonmap = json.load(msg)
       if classname(jsonmap)=='map'
         self._pool = jsonmap
