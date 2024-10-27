@@ -23,23 +23,19 @@ pt_module.init = def (m)
     var _exec_callback # will be used when we get the retained message
     static _save_rule = 'System#Save' # rule to save the data on planned restarts
     static _errmsg = 'Not ready. The module did not get the variables from the server' # To avoid repeating the same err message across the code
-    #var _debug # Controls some debugging messages. May be removed
     var _dirty
     var _ready
 
     def init()
       self._ready = false
-      #self._dirty = false
       self._exec_callback = [] 
-      #self._debug = false
-      #self._pool = {}
-      mqtt.unsubscribe(PersistMQTT._topic) # in case of reloading
+      mqtt.unsubscribe(PersistMQTT._topic) # devel
       mqtt.subscribe(
         PersistMQTT._topic,
         /_topic_, _idx_, msg -> self._receive_cb(msg) # we are interested on the retained message only
       )
       # On a planned restart (restart 1 or GUI restart) a pt.save() is performed
-      tasmota.remove_rule(PersistMQTT._save_rule, PersistMQTT._unique_id) # to disconnect older module (devel)
+      tasmota.remove_rule(PersistMQTT._save_rule, PersistMQTT._unique_id) # devel
       tasmota.add_rule(PersistMQTT._save_rule, /->self.save(), PersistMQTT._unique_id)
     end
 
@@ -68,7 +64,6 @@ pt_module.init = def (m)
     end
 
     def has(myvar)
-      # print(PersistMQTT._errmsg)
       return self._pool.has(myvar)
     end
 
@@ -81,16 +76,15 @@ pt_module.init = def (m)
     end
 
     def save()
-      # print('pt.save()')
       if !self._ready print(PersistMQTT._errmsg) return end
       if !self._dirty return end
       mqtt.publish(PersistMQTT._topic, json.dump(self._pool), true)
       self._dirty = false
     end
 
-    ### functions that are not present in persist buildin module ###
+    ### functions that are not exist in persist buildin module ###
 
-    def values()
+    def values() # for debugging
       return json.dump(self._pool)
     end
 
@@ -126,11 +120,9 @@ pt_module.init = def (m)
       end
       if self._ready
         # executes the function in the next tick
-        # print('exec() immediatelly') end
         tasmota.set_timer(0,cb)
       else
         # postpone the execution for the variables to become ready
-        # print('exec() when ready') end
         self._exec_callback.push(cb)
       end
     end
@@ -145,7 +137,7 @@ pt_module.init = def (m)
       var fd=open(fn)
       var local_script = fd.read() # string
       fd.close() fd = nil
-      if size(local_script) < 2000 # a rudimentary check
+      if size(local_script) < 2000 # a simple check
         print('Cannot read the local script')
         return
       end
@@ -173,7 +165,7 @@ pt_module.init = def (m)
       print( '' .. self .. '.deinit()' )
     end
 
-  end # class mqttvar
+  end # class PersistMQTT
 
   return PersistMQTT()
 end
