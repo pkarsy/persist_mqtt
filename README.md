@@ -114,7 +114,7 @@ pt.save() like persist.save() is the responsibility of the developer. On a plann
 
 - **pt.values()** For debugging purposes, return the full database of vars as a json string.
 
-- **pt.selfupdate()** fetches an updated (if it exists) persist_mqtt module from the github page. For interactive use only.
+- **pt.selfupdate()** fetches an updated (if it exists) "pt.be" module from the github page. For interactive use only.
 
 - **pt.initvars()** Used when we install persist_mqtt to a new tasmota system(with a new unique "topic"), and we have to init the variables. For interactive use only.
 
