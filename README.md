@@ -110,9 +110,13 @@ pt.save() like persist.save() is the responsibility of the developer. On a plann
 
 ### Methods not present in buildin persist
 
-- pt.selfupdate() fetches an updated (if it exists) persist_mqtt module from the github page. For interactive use only.
+- **pt.ready()** and **pt.exec(func)**. Used when importing the module, as we've seen.
 
-- pt.initvars() Used when we install persist_mqtt to a new tasmota system(with a new unique "topic"), and we have to init the variables.
+- **pt.values** For debugging purposes, return the full database of vars as a json string.
+
+- **pt.selfupdate()** fetches an updated (if it exists) persist_mqtt module from the github page. For interactive use only.
+
+- **pt.initvars()** Used when we install persist_mqtt to a new tasmota system(with a new unique "topic"), and we have to init the variables. For interactive use only.
 
 ## Pros
 - The data can be changed frequently, without limits, which is a consideration with internal flash.
@@ -132,6 +136,7 @@ You may want this to reduce flash wear when writing a new berry program, or to b
 
 ```berry
 def myfunc()
+  # any time you can switch back to persist
   # import persist
   import pt as persist
   if !pt.ready() pt.exec(myfunc) return end
