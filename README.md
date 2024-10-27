@@ -1,6 +1,6 @@
 # persist_mqtt
 
-Tasmota berry module analogous to persist, but stores the data to the MQTT server. One can switch from persist to persist_mqtt or the other way around at any time when developing, only by changing the import method.
+Tasmota berry module analogous to persist, but stores the data to the MQTT server. One can switch from persist to persist_mqtt (or the opposite) at any time when developing, only by changing the import method. Tested with Tasmota 14.3
 
 If the server lives outside LAN, the connection must be secured with TLS. The variables are stored in cleartext, keep this in mind.
 
@@ -10,6 +10,7 @@ Put the "pt.be" file at the top level of the ESP32xx filesystem.
 ## Initializing the module for the first time
 Write in **Berry Scripting Console**:
 ```berry
+> # Warning interactive console
 > import pt
 > pt.initvars() # Creates an empty pool of variables.
 ```
@@ -30,7 +31,6 @@ In 'autoexec.be' add theese lines
 import  pt
 pt.exec(/-> load('myscript1.be'))  # will be executed only after the variables are ready
 pt.exec( /-> load('myscript2.be')) # both scripts can use the "pt" object freely
-                                   # The sripts will be executed after autoexec finishes
 ```
 
 ## Method 2
@@ -104,7 +104,7 @@ pt.save() like persist.save() is the responsibility of the developer. On a plann
 |can be used immediately after import   |   Needs some procedure see above |
 | very fast     |      limited by the network latency |
 | flash wear    |      unlimited writes (only limit is the network usage) |
-| variables can be seen by accessing the filesystem  |   can be viwed in real time with an mqtt client |
+| variables can only be seen by accessing the filesystem  |   can be viwed in real time with an mqtt client |
 
 ### Methods not present in buildin persist
 
