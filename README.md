@@ -106,7 +106,7 @@ pt.save() like persist.save() is the responsibility of the developer. On a plann
 |can be used immediately after import   |   Needs some procedure see above |
 | very fast     |      limited by the network latency |
 | flash wear    |      unlimited writes (only limit is the network usage) |
-| variables can only be seen by accessing the filesystem  |   can be viwed in real time with an mqtt client |
+| variables can only be seen by accessing the filesystem  |   can be viewed in real time with an mqtt client |
 
 ### Methods not present in buildin persist
 
