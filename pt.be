@@ -1,8 +1,8 @@
 #-
 WARNING ! No guaranties about losing important data, see MIT LICENCE
-WARNING ! Importing the persist_mqtt module is not straightforward.
+WARNING ! Importing the persist_mqtt module is not as straightforward as persist.
 See README before use
-Version 0.9.1
+Version 0.9.2
 -#
 
 var pt_module = module("persist_mqtt")
