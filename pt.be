@@ -2,7 +2,7 @@
 WARNING ! No guaranties about losing important data, see MIT LICENCE
 WARNING ! Importing the persist_mqtt module is not straightforward.
 See README before use
-Version 0.8.10
+Version 0.9.1
 -#
 
 var pt_module = module("persist_mqtt")
@@ -139,33 +139,32 @@ pt_module.init = def (m)
       return self._ready
     end
 
-      # TODO string
     def selfupdate()
       self.save()
       var fn = '/pt.be'
       var fd=open(fn)
-      var lbytes = fd.readbytes()
+      var local_script = fd.read() # string
       fd.close() fd = nil
-      if size(lbytes) < 2000
+      if size(local_script) < 2000 # a rudimentary check
         print('Cannot read the local script')
         return
       end
       var cl = webclient()
       cl.begin('https://raw.githubusercontent.com/pkarsy/persist_mqtt/refs/heads/main' + fn)
       cl.GET()
-      var rbytes = cl.get_bytes()
+      var remote_script = cl.get_string()
       cl.close() cl = nil
-      if size(rbytes) < 2000
-        print('Cannot fetch the remote script')
+      if size(remote_script) < 2000
+        print('Cannot get the remote script')
         return
       end
-      if rbytes == lbytes
+      if remote_script == local_script
         print('The code is up to date')
         return
       end
-      lbytes = nil
+      local_script = nil
       fd = open(fn, 'w')
-      fd.write(rbytes)
+      fd.write(remote_script)
       fd.close()
       print('Got update from github')
     end

@@ -47,11 +47,13 @@ do # optional, hides BootCount() from the global namespace
     else
       pt.BootCount += 1
     end
+    pt.save() # sends the updated var to the server, inspect the MQTT messages
     print('BootCount =', pt.BootCount)
   end
 
   BootCount() 
 end
+
 ```
 The line containing "if !pt.ready()..." does all the magic, basically the function is reexecuted when the variables are ready.
 
@@ -121,7 +123,7 @@ pt.save() like persist.save() is the responsibility of the developer. On a plann
 - The module cannot be used immediatelly, complicating the import as we've seen above.
 - limited space for variables (~1000 bytes in json format)
 - The speed of save() is slow due to netwotk latency. However mqtt seems to be performed asynchronously, so the save() actually returns fast.
-- **Anyone who has access to the server, can view and change the variables ! BE WARNED ! DO NOT USE IT FOR CONFIDENTIAL DATA**
+- **Anyone who has access to the server, can view and change the variables ! Even worse if the connection is not secured with SSL/TLS. BE WARNED ! DO NOT USE IT FOR CONFIDENTIAL DATA**
 - Cannot be used (or adds complexity) if the tasmota system does not use an MQTT server or has no network at all.
 
 ## How to temporarily use persist_mqtt(pt) instead of persist for development
