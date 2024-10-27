@@ -45,7 +45,6 @@ pt_module.init = def (m)
       if !self._ready print(PersistMQTT._errmsg) return end
       self._pool = {}
       self._dirty = true
-      print('All vars are cleared, do a save() to also clear the variables on server, or hw reset/poweroff to avoid this.')
     end
 
     def member(myvar) # Implements of using "pt.myvar"
