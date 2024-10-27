@@ -2,7 +2,7 @@
 WARNING ! No guaranties about losing important data, see MIT LICENCE
 WARNING ! Importing the persist_mqtt module is not as straightforward as persist.
 See README before use
-Version 0.9.2
+Version 0.9.3
 -#
 
 var pt_module = module("persist_mqtt")
@@ -39,7 +39,7 @@ pt_module.init = def (m)
       tasmota.add_rule(PersistMQTT._save_rule, /->self.save(), PersistMQTT._unique_id)
     end
 
-    ### functions that work as the stock persist ###
+    ### functions that work as the buildin tasmota persist ###
 
     def zero()
       if !self._ready print(PersistMQTT._errmsg) return end
@@ -66,7 +66,7 @@ pt_module.init = def (m)
       return self._pool.has(myvar)
     end
 
-    def dirty() # The next save() will actually send mqtt data
+    def dirty()
       self._dirty = true
     end
 
@@ -81,11 +81,7 @@ pt_module.init = def (m)
       self._dirty = false
     end
 
-    ### functions that are not exist in persist buildin module ###
-
-    def values() # for debugging
-      return json.dump(self._pool)
-    end
+    ### functions that are not exist in persist
 
     def initvars()
       if self._ready
@@ -96,7 +92,7 @@ pt_module.init = def (m)
       print('Init with empty pool')
     end
 
-    def _receive_cb(msg) # For internal use. Get the retained msg from the mqtt server
+    def _receive_cb(msg) # For internal use. Gets the retained msg from the server
       var jsonmap = json.load(msg)
       if classname(jsonmap)=='map'
         self._pool = jsonmap
@@ -112,7 +108,7 @@ pt_module.init = def (m)
       self._ready = true
     end
 
-    def exec(cb) # calls the "cb" function/closure when the variables are feched from the server
+    def exec(cb)
       if type(cb) != 'function'
         print('Needs a callback function, got', type(cb) )
         return
@@ -126,7 +122,7 @@ pt_module.init = def (m)
       end
     end
 
-    def ready() # true when vars are feched. You cannot use it in a waiting loop, see the README
+    def ready()
       return self._ready
     end
 
@@ -169,4 +165,4 @@ pt_module.init = def (m)
   return PersistMQTT()
 end
 
-return pt_module
+return pt_module # pt_module.init() -> the monad PersistMQTT()
