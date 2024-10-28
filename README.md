@@ -9,21 +9,18 @@ If the server lives outside LAN, the connection must be secured with TLS. The va
 copy and paste the following code to the Berry Console
 ```berry
 do
-    def get_pt()
-        var fn = 'pt.be'
-        var cl = webclient()
-        var url = 'https://raw.githubusercontent.com/pkarsy/persist_mqtt/refs/heads/main/'+fn
-        cl.begin(url)
-        var r = cl.GET()
-        if r != 200 print('Error getting',fn) end
-        var s = cl.get_string()
-        cl.close() cl = nil
-        var f = open('/'+fn, 'w')
-        f.write(s)
-        f.close()
-        print('Installed', fn)
-    end
-    get_pt()
+  var fn = 'pt.be'
+  var cl = webclient()
+  var url = 'https://raw.githubusercontent.com/pkarsy/persist_mqtt/refs/heads/main/'+fn
+  cl.begin(url)
+  var r = cl.GET()
+  if r != 200 print('Error getting',fn) end
+  var s = cl.get_string()
+  cl.close() cl = nil
+  var f = open('/'+fn, 'w')
+  f.write(s)
+  f.close()
+  print('Installed', fn)
 end
 ```
 
