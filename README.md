@@ -37,7 +37,7 @@ Write in **Berry Scripting Console**:
 
 After this and for interactive use (Berry Scripting Console), the module can be loaded as usual.
 
-## Import the module in scripts
+## Import the module in scripts. DO NOT SKIP THIS !
 For use by other scrips or "autoxec.be", **special attention is needed**. When the module is first imported (after boot), it needs some time to get (asynchronously) the variables from the server. Any code trying to use the module in this time, will find it in an unusable state (all variables will retutn nil and no assignment is possible).
 
 **Note that we cannot wait for pt.ready() to become true.** Berry is single threaded, and code like "while !pt.ready() end" will not allow the pt module to actually get ready (to receive MQTT messages) and will deadlock and freeze the whole ESP32 tasmota system.
