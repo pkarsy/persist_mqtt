@@ -16,7 +16,7 @@ do
   var r = cl.GET()
   if r != 200 print('Error getting',fn) end
   var s = cl.get_string()
-  cl.close() cl = nil
+  cl.close()
   var f = open('/'+fn, 'w')
   f.write(s)
   f.close()
