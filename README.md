@@ -99,7 +99,7 @@ pt.remove('counter') # does nothing if var "pt.counter" is not defined
 #
 # pt.has() can distinguish between a non existent variable and a nil one.
 #
-pt.newvar == nil # returns true if 'newvar' is not defined
+pt.newvar # returns nil if 'newvar' is not defined.
 pt.has('newvar') # -> false
 pt.newvar = nil
 pt.has('newvar') # -> true this time
