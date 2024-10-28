@@ -53,7 +53,7 @@ pt.exec( /-> load('myscript2.be')) # both scripts can use the "pt" object freely
 ```
 
 ## Method 2
-Works without relying on "autoexec.be" exec(), and without even including "pt" in the global namespace. If the script needs to be started from "autoexec.be", load the script as usual with load('mycode.be'). Or just paste the code inside autoexec.be
+Works without relying on "autoexec.be", and without including "pt" in the global namespace. If the script needs to be started from "autoexec.be", load the script as usual with load('myscript.be'). Or just paste the code inside autoexec.be
 
 ```berry
 do # optional, hides BootCount() from the global namespace
@@ -117,7 +117,7 @@ Only values that can be serialized with json can be saved. Fortunatelly this inc
 - About 1000 bytes of json data can be saved. This is OK for the intented purpose, which is to store a limited set of frequently changed values such as counters. For bigger storage needs, or data that are not frequently changing, you can use the persist module.
 
 ## Saving the variables
-pt.save() like persist.save() is the responsibility of the developer. On a planned restart (web interface or a "restart 1" command) a pt.save() will be performed automatically (persist also is doing the same). Of course a power outage or a crash will lead to data loss.
+pt.save() like persist.save() is the responsibility of the developer. On a planned restart (web interface or a "restart 1" command) a pt.save() will be performed automatically (persist also is doing the same). Of course a power outage or a crash (without a previous save) will lead to data loss.
 
 ## Differences
 
