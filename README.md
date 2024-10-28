@@ -74,7 +74,7 @@ do # optional, hides BootCount() from the global namespace
 end
 
 ```
-The line containing "if !pt.ready()..." does all the magic, basically the function is reexecuted when the variables are ready.
+The line containing "if !pt.ready()..." does the trick, basically the function is reexecuted when the variables are ready.
 
 ## Usage (Identical with persist)
 ```berry
@@ -108,7 +108,7 @@ pt.find('newvar2') # -> nil
 pt.find('newvar2', 10) # returns 10 if var does not exist
 ```
 
-## Allowed data types
+## Allowed data types (The same with persist, as far as I can tell)
 Only values that can be serialized with json can be saved. Fortunatelly this includes most useful cases.
 - Simple data types like integers, reals, strings.
 - tables ie [1, 2, "test"] , [1, 2.2, [3, "4"]]
@@ -117,7 +117,9 @@ Only values that can be serialized with json can be saved. Fortunatelly this inc
 - About 1000 bytes of json data can be saved. This is OK for the intented purpose, which is to store a limited set of frequently changed values such as counters. For bigger storage needs, or data that are not frequently changing, you can use the persist module.
 
 ## Saving the variables
-pt.save() like persist.save() is the responsibility of the developer. On a planned restart (web interface or a "restart 1" command) a pt.save() will be performed automatically (persist also is doing the same). Of course a power outage or a crash will lead to data loss. Here is a summary of differences between persist and persist_mqtt
+pt.save() like persist.save() is the responsibility of the developer. On a planned restart (web interface or a "restart 1" command) a pt.save() will be performed automatically (persist also is doing the same). Of course a power outage or a crash will lead to data loss.
+
+## Differences
 
 | persist       |      persist_mqtt(pt) |
 | --------------|-------------------|
@@ -126,6 +128,7 @@ pt.save() like persist.save() is the responsibility of the developer. On a plann
 | very fast     |      limited by the network latency |
 | flash wear    |      unlimited writes (only limit is the network usage) |
 | variables can only be seen by accessing the filesystem  |   can be viewed in real time with an mqtt client |
+| data safety is OK | depends on the server(backup if unsure) |
 
 ### Methods not present in buildin persist
 
@@ -140,7 +143,7 @@ pt.save() like persist.save() is the responsibility of the developer. On a plann
 ## Pros
 - The data can be changed frequently, without limits, which is a consideration with internal flash.
 - We can inspect the variables with an MQTT client, making the module a good debugging tool.
-- The server checks if the request is valid/complete so it is very difficult for the database to be corrupted.
+- The server checks if the request is valid/complete so it is very difficult for the database to be corrupted. To be fair I have never experinced data corruption with persist either.
 
 ## Cons
 - The module cannot be used immediatelly, complicating the import as we've seen above.
