@@ -13,11 +13,10 @@ do
   var cl = webclient()
   var url = 'https://raw.githubusercontent.com/pkarsy/persist_mqtt/refs/heads/main/'+fn
   cl.begin(url)
-  var r = cl.GET()
-  if r != 200 print('Error getting',fn) end
+  if cl.GET() != 200 print('Error getting', fn) return end
   var s = cl.get_string()
   cl.close()
-  var f = open('/'+fn, 'w')
+  var f = open(fn, 'w')
   f.write(s)
   f.close()
   print('Installed', fn)
