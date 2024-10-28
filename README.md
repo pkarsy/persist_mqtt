@@ -4,7 +4,30 @@ Tasmota berry module analogous to persist, but stores the data to the MQTT serve
 
 If the server lives outside LAN, the connection must be secured with TLS. The variables are stored in cleartext, keep this in mind.
 
-## Installation
+
+## Quick installation
+copy and paste the following code to the Berry Console
+```berry
+do
+    def get_pt()
+        var fn = 'pt.be'
+        var cl = webclient()
+        var url = 'https://raw.githubusercontent.com/pkarsy/persist_mqtt/refs/heads/main/'+fn
+        cl.begin(url)
+        var r = cl.GET()
+        if r != 200 print('Error getting',fn) end
+        var s = cl.get_string()
+        cl.close() cl = nil
+        var f = open('/'+fn, 'w')
+        f.write(s)
+        f.close()
+        print('Installed', fn)
+    end
+    get_pt()
+end
+```
+
+## Manual Installation
 Put the "pt.be" file at the top level of the ESP32xx filesystem.
 
 ## Initializing the module for the first time
