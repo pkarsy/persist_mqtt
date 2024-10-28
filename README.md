@@ -151,6 +151,7 @@ pt.save() like persist.save() is the responsibility of the developer. On a plann
 - The speed of save() is slow due to netwotk latency. However mqtt seems to be performed asynchronously, so the save() actually returns fast.
 - **Anyone who has access to the server, can view and change the variables ! Even worse if the connection is not secured with SSL/TLS. BE WARNED ! DO NOT USE IT FOR CONFIDENTIAL DATA**
 - Cannot be used (or adds complexity) if the tasmota system does not use an MQTT server or has no network at all.
+- Unstable network connections can cause problems, and the module should not be used in such cases.
 
 ## How to temporarily use persist_mqtt(pt) instead of persist for development
 
