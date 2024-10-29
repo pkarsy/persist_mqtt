@@ -96,6 +96,7 @@ pt.save() # without .dirty() will not save the variable
 ...
 pt.has('counter') # -> true/false
 pt.remove('counter') # does nothing if var "pt.counter" is not defined
+pt.save()
 #
 # pt.has() can distinguish between a non existent variable and a nil one.
 #
@@ -103,6 +104,7 @@ pt.newvar # returns nil if 'newvar' is not defined.
 pt.has('newvar') # -> false
 pt.newvar = nil
 pt.has('newvar') # -> true this time
+pt.save()
 #
 pt.find('newvar2') # -> nil
 pt.find('newvar2', 10) # returns 10 if var does not exist
@@ -162,7 +164,7 @@ def myfunc()
   # any time you can switch back to persist
   # import persist
   import pt as persist
-  if !pt.ready() pt.exec(myfunc) return end
+  if !persist.ready() persist.exec(myfunc) return end
   # no need to change the code
   persist.var1 += 1
   persist.save()
